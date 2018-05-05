@@ -7,6 +7,7 @@
 #include "align.h"
 #include "merge.h"
 #include "finish.h"
+#include <math.h>
 
 using namespace Halide;
 
@@ -30,6 +31,31 @@ void GetImageDimensios(std::string img_path, int &img_width, int &img_height)
         }
     }
 }
+
+void GetBWLevels(std::string img_path, BlackPoint &img_b, WhitePoint &img_w)
+{
+    Tools::Internal::PipeOpener f(("exiftool " + img_path).c_str(), "r");
+    char buf[1024];
+    img_w = 0;
+    img_b = 0;
+    while(f.f != nullptr) {
+        f.readLine(buf, 1024);
+        float b, w;
+        if(sscanf(buf, "White Level                     : %f", &w) == 1) {
+            img_w = (int)floor(w);
+            printf("White level: %d\n", img_w);
+            if(img_w != 0 && img_b != 0)
+                return;
+        }
+        if(sscanf(buf, "Black Level                     : %f", &b) == 1) {
+            img_b = (int)floor(b);
+            printf("Black level: %d\n", img_b);
+            if(img_w != 0 && img_b != 0)
+                return;
+        }
+    }
+}
+
 
 class HDRPlus {
 
@@ -215,8 +241,9 @@ int main(int argc, char* argv[]) {
     if(!HDRPlus::load_raws(dir_path, in_names, imgs)) return -1;
 
     const WhiteBalance wb = read_white_balance(dir_path + "/" + in_names[0]);
-    const BlackPoint bp = 52;
-    const WhitePoint wp = 1023;
+    BlackPoint bp;
+    WhitePoint wp;
+    GetBWLevels(dir_path + "/" + in_names[0], bp, wp);
 
     HDRPlus hdr_plus = HDRPlus(imgs, bp, wp, wb, c, g);
 
