@@ -119,7 +119,7 @@ class HDRPlus {
  */
 const WhiteBalance read_white_balance(std::string file_path) {
 
-    Tools::Internal::PipeOpener f(("dcraw -v -i " + file_path).c_str(), "r");
+    Tools::Internal::PipeOpener f(("../tools/dcraw -v -i " + file_path).c_str(), "r");
     
     char buf[1024];
 
