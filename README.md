@@ -8,7 +8,7 @@ To compile, follow these steps:
 ```
 mkdir build
 cd build
-sudo apt-get install libjpg-dev libpng-dev
+sudo apt-get install libjpg-dev libpng-dev libimage-exiftool-perl dcraw
 cmake ..
 make
 ```
