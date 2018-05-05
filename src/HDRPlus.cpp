@@ -131,6 +131,7 @@ const WhiteBalance read_white_balance(std::string file_path) {
 
         if(sscanf(buf, "Camera multipliers: %f %f %f %f", &r, &g0, &b, &g1) == 4) {
 
+            if(g1 == 0) g1 = g0;
             float m = std::min(std::min(r, g0), std::min(g1, b));
 
             return {r / m, g0 / m, g1 / m, b / m};
